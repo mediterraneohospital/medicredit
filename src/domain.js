@@ -12,6 +12,11 @@ export function allocate(costs,target){
  const parts=costs.map((n,i)=>{const product=BigInt(n)*BigInt(target);return {i,n:Number(product/BigInt(total)),r:product%BigInt(total)};});
  let left=target-sum(parts,p=>p.n);[...parts].sort((a,b)=>a.r===b.r?a.i-b.i:a.r>b.r?-1:1).slice(0,left).forEach(p=>p.n++);return parts.map(p=>p.n);
 }
+// Ημιτελής κατανομή Plafond: όταν δεν έχουν καταχωριστεί ακόμη όλες οι εταιρείες,
+// η πρόταση κάθε εταιρείας ισούται με κόστος × (C−P) / C, στρογγυλοποιημένη στο λεπτό.
+export function partialShare(cost,target,total){
+ if(!total)return 0;const p=BigInt(cost)*BigInt(target)*2n+BigInt(total);return Number(p/(BigInt(total)*2n));
+}
 export function status(c){
  if(c.closedReason?.trim())return 'Κλειστό με διαφορά';
  if(!c.lines.length)return 'Νέο';
