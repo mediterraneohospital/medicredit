@@ -15,4 +15,7 @@
 .credit-table{table-layout:fixed}.credit-table th,.credit-table td{padding-left:8px;padding-right:8px}.credit-table th:first-child{width:25%}.credit-table th:nth-child(2){width:12%}.credit-table th:nth-child(n+3):nth-child(-n+6){width:11%}.credit-table th:nth-child(7){width:10%}.credit-table th:nth-child(8){width:9%}.page-heading>.primary{margin-right:clamp(28px,5vw,96px)}@media(max-width:850px){.credit-table{min-width:920px}.page-heading>.primary{margin-right:0}}
 .rejected-amount{color:#b85c58;font-weight:650}
 
+/* Stable positioning across sections */
+.page-heading{min-height:76px}.filters{min-height:58px}.panel-title{min-height:79px}.report-tabs{margin:0;align-items:center}.company-filters .search{max-width:430px}
+
 
