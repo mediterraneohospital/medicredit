@@ -22,6 +22,13 @@ export function status(c){
 }
 export const outstanding=l=>l.stage==='Προς αίτηση'?l.proposed:Math.max(0,l.requested-l.received);
 export const waitingDays=(l,now=today())=>l.requestDate?Math.max(0,Math.round((Date.parse(now)-Date.parse(l.requestDate))/86400000)):0;
+// Μη μπλοκαριστικές προειδοποιήσεις: επιτρέπεται αποθήκευση με ημιτελή αθροίσματα.
+export function totalsWarnings(c){
+ const w=[];if(!c.lines.length)return w;
+ if(sum(c.lines,l=>l.cost)!==c.total)w.push('Το άθροισμα κόστους εταιρειών δεν ισούται με το συνολικό κόστος.');
+ if(sum(c.lines,l=>l.proposed)!==c.total-c.recognized)w.push('Το άθροισμα προτεινόμενων πιστωτικών δεν ισούται με το ποσό προς κάλυψη.');
+ return w;
+}
 export function validate(c){
  const errors=[];const validDate=s=>/^\d{4}-\d{2}-\d{2}$/.test(s||'')&&!Number.isNaN(Date.parse(s))&&new Date(s).toISOString().slice(0,10)===s;
  if(!c.code.trim()||!c.patient.trim()||!c.doctor.trim()||!validDate(c.incidentDate)||!validDate(c.date))errors.push('Συμπληρώστε κωδικό, ασθενή, ιατρό, ημερομηνία περιστατικού και ημερομηνία επιτροπής.');
@@ -29,10 +36,8 @@ export function validate(c){
  if(!TYPES.includes(c.type))errors.push('Μη έγκυρος τύπος περικοπής.');
  if(!Number.isSafeInteger(c.total)||c.total<0||c.total>10000000000||!Number.isSafeInteger(c.recognized)||c.recognized<0||c.recognized>c.total)errors.push('Το αναγνωρισμένο ποσό πρέπει να είναι από 0 έως το συνολικό κόστος.');
  if(c.lines.length){
- if(sum(c.lines,l=>l.cost)!==c.total)errors.push('Το άθροισμα κόστους εταιρειών δεν ισούται με το συνολικό κόστος.');
- if(sum(c.lines,l=>l.proposed)!==c.total-c.recognized)errors.push('Το άθροισμα προτεινόμενων πιστωτικών δεν ισούται με το ποσό προς κάλυψη.');
  if(new Set(c.lines.map(l=>l.companyId)).size!==c.lines.length)errors.push('Κάθε εταιρεία καταχωρείται μία φορά ανά περιστατικό.');
- let expected;try{if(c.type==='Plafond')expected=allocate(c.lines.map(l=>l.cost),c.total-c.recognized);}catch{}
+ let expected;try{if(c.type==='Plafond'&&!totalsWarnings(c).length)expected=allocate(c.lines.map(l=>l.cost),c.total-c.recognized);}catch{}
  c.lines.forEach((l,i)=>{
  const prefix=`Εταιρεία ${i+1}: `;
  if(!l.companyId)errors.push(prefix+'επιλέξτε εταιρεία.');
