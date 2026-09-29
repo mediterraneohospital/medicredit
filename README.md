@@ -112,3 +112,11 @@ node --test tests/domain.test.mjs
 Δείτε `TESTING.md` για τα αποτελέσματα και τους ελέγχους που μένουν στο live project.
 
 Επίσημες αναφορές: [Supabase RLS](https://supabase.com/docs/guides/database/postgres/row-level-security), [Storage access control](https://supabase.com/docs/guides/storage/security/access-control), [Supabase Auth](https://supabase.com/docs/reference/javascript/auth-signinwithpassword).
+
+## Βελτιώσεις καθημερινής καταχώρησης
+
+- Προσθήκη εταιρείας από την αρχή ή το τέλος των γραμμών και άμεση δημιουργία νέας εταιρείας μέσα στο περιστατικό.
+- Στα «Συγκεκριμένα υλικά» το κόστος εταιρείας συμπληρώνει αυτόματα πρόταση και ποσό αιτήματος.
+- Η παραλαβή ποσού συμπληρώνει αυτόματα τη σημερινή ημερομηνία· αριθμός και PDF πιστωτικού είναι προαιρετικά.
+- Νέα κατάσταση «Απορρίφθηκε» και ξεχωριστό σύνολο στο Dashboard.
+- Επικόλληση ημερομηνιών σε μορφή ΗΗ/ΜΜ/ΕΕΕΕ, ΗΗ-ΜΜ-ΕΕΕΕ ή ΕΕΕΕ-ΜΜ-ΗΗ.
