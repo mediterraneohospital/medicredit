@@ -1,5 +1,5 @@
-import {TYPES,STATUSES,STAGES,money,sum,cents,decimal,today,allocate,status,outstanding,rejected,waitingDays,validate,totalsWarnings,partialShare} from './domain.js?v=1.7';
-import * as store from './data.js?v=1.7';
+import {TYPES,STATUSES,STAGES,money,sum,cents,decimal,today,allocate,status,outstanding,rejected,waitingDays,validate,totalsWarnings,partialShare} from './domain.js?v=1.8';
+import * as store from './data.js?v=1.8';
 const $=s=>document.querySelector(s), esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const icons={dashboard:'M3 3h7v7H3z M14 3h7v4h-7z M14 11h7v10h-7z M3 14h7v7H3z',cases:'M3 7h18v14H3z M7 7V3h10v4 M3 12h18',credits:'M4 3h16v18l-4-2-4 2-4-2-4 2z M8 8h8 M8 12h8',companies:'M4 21V3h12v18 M16 9h4v12 M8 7h4 M8 11h4 M8 15h4 M2 21h20',reports:'M4 20V10 M10 20V4 M16 20v-7 M22 20H2'};
 const icon=k=>`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${icons[k]||icons.cases}"/></svg>`;
