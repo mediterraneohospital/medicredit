@@ -1,6 +1,6 @@
 export const TYPES=['Plafond','Συγκεκριμένα υλικά','Άλλο'];
 export const STATUSES=['Νέο','Προς αίτηση','Αναμονή πιστωτικών','Μερικώς ολοκληρωμένο','Ολοκληρωμένο','Κλειστό με διαφορά'];
-export const STAGES=['Προς αίτηση','Ζητήθηκε','Παραλήφθηκε'];
+export const STAGES=['Προς αίτηση','Ζητήθηκε','Παραλήφθηκε','Απορρίφθηκε'];
 export const money=n=>new Intl.NumberFormat('el-GR',{style:'currency',currency:'EUR'}).format(n/100);
 export const sum=(xs,fn)=>xs.reduce((a,x)=>a+fn(x),0);
 export function cents(value){const s=String(value??'').trim().replace(',','.');if(!/^\d+(\.\d{1,2})?$/.test(s))throw Error('Ποσά: θετικός αριθμός με έως 2 δεκαδικά, χωρίς διαχωριστικό χιλιάδων.');const [a,b='']=s.split('.');const n=Number(a)*100+Number(b.padEnd(2,'0'));if(!Number.isSafeInteger(n)||n>10000000000)throw Error('Το ποσό υπερβαίνει το όριο.');return n;}
@@ -20,12 +20,14 @@ export function partialShare(cost,target,total){
 export function status(c){
  if(c.closedReason?.trim())return 'Κλειστό με διαφορά';
  if(!c.lines.length)return 'Νέο';
+ if(c.lines.some(l=>l.stage==='Απορρίφθηκε')&&c.lines.every(l=>['Παραλήφθηκε','Απορρίφθηκε'].includes(l.stage)))return 'Κλειστό με διαφορά';
  if(c.lines.every(l=>l.stage==='Παραλήφθηκε'&&l.received===l.requested)&&sum(c.lines,l=>l.received)===c.total-c.recognized)return 'Ολοκληρωμένο';
  if(c.lines.some(l=>l.received>0||l.stage==='Παραλήφθηκε'))return 'Μερικώς ολοκληρωμένο';
  if(c.lines.some(l=>l.stage==='Ζητήθηκε'))return 'Αναμονή πιστωτικών';
  return 'Προς αίτηση';
 }
-export const outstanding=l=>l.stage==='Προς αίτηση'?l.proposed:Math.max(0,l.requested-l.received);
+export const outstanding=l=>l.stage==='Απορρίφθηκε'?0:l.stage==='Προς αίτηση'?l.proposed:Math.max(0,l.requested-l.received);
+export const rejected=l=>l.stage==='Απορρίφθηκε'?Math.max(0,l.requested-l.received):0;
 export const waitingDays=(l,now=today())=>l.requestDate?Math.max(0,Math.round((Date.parse(now)-Date.parse(l.requestDate))/86400000)):0;
 // Μη μπλοκαριστικές προειδοποιήσεις: επιτρέπεται αποθήκευση με ημιτελή αθροίσματα.
 export function totalsWarnings(c){
@@ -53,7 +55,7 @@ export function validate(c){
  if(l.stage==='Προς αίτηση'&&(l.received||l.requestDate||l.receiveDate||l.creditNumber))errors.push(prefix+'η παραλαβή/αίτηση απαιτεί αλλαγή κατάστασης.');
  if(l.stage!=='Προς αίτηση'&&!validDate(l.requestDate))errors.push(prefix+'απαιτείται ημερομηνία αιτήματος.');
  if(l.receiveDate&&!validDate(l.receiveDate))errors.push(prefix+'μη έγκυρη ημερομηνία παραλαβής.');
- if((l.received>0||l.stage==='Παραλήφθηκε')&&(!validDate(l.receiveDate)||!l.creditNumber.trim()))errors.push(prefix+'απαιτούνται ημερομηνία και αριθμός πιστωτικού.');
+ if((l.received>0||l.stage==='Παραλήφθηκε')&&!validDate(l.receiveDate))errors.push(prefix+'απαιτείται ημερομηνία παραλαβής.');
  if(l.requestDate&&l.requestDate<c.date)errors.push(prefix+'το αίτημα προηγείται της επιτροπής.');
  if(l.receiveDate&&l.receiveDate<l.requestDate)errors.push(prefix+'η παραλαβή προηγείται του αιτήματος.');
  });}
