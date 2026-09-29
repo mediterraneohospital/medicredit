@@ -18,4 +18,7 @@
 /* Stable positioning across sections */
 .page-heading{min-height:76px}.filters{min-height:58px}.panel-title{min-height:79px}.report-tabs{margin:0;align-items:center}.company-filters .search{max-width:430px}
 
+/* Keep primary actions close to the left-hand content */
+.page-heading{justify-content:flex-start}.page-heading>.primary{margin-left:44px;margin-right:0}.reports-title{justify-content:flex-start}.reports-title .report-tabs{margin-left:34px}@media(max-width:850px){.page-heading>.primary,.reports-title .report-tabs{margin-left:0}.reports-title{flex-wrap:wrap}}
+
 
