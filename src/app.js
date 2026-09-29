@@ -43,13 +43,27 @@ function showCase(){const d=$('#editor');d.innerHTML=`<form id="case-form"><div 
 function appendLine(){const i=draft.lines.length-1;$('#lines').insertAdjacentHTML('beforeend',lineForm(draft.lines[i],i));bindLines();calculate();}
 function bindLines(){$('#editor').querySelectorAll('[data-remove]').forEach(b=>b.onclick=()=>{try{readDraft();const line=draft.lines.find(l=>l.id===b.dataset.remove);if((line.requestDate||line.received)&&!confirm('Να αφαιρεθεί η εταιρεία και η παρακολούθηση πιστωτικού από το περιστατικό;'))return;draft.lines=draft.lines.filter(l=>l.id!==b.dataset.remove);b.closest('.line-card').remove();dirty=true;calculate();}catch(e){formError(e);}});$('#editor').querySelectorAll('[data-file-line]').forEach(b=>b.onclick=()=>openFile(draft.lines.find(l=>l.id===b.dataset.fileLine).credit));}
 function readDraft(){const f=$('#case-form');for(const k of ['code','patient','doctor','incidentDate','date','type','notes','closedReason'])draft[k]=f.elements[k].value.trim();draft.total=cents(f.elements.total.value);draft.recognized=cents(f.elements.recognized.value);for(const el of f.querySelectorAll('[data-line]')){const l=draft.lines.find(l=>l.id===el.dataset.line);for(const k of ['companyId','stage','requestDate','receiveDate','creditNumber'])l[k]=el.querySelector(`[name="${k}"]`).value.trim();for(const k of ['cost','proposed','requested','received'])l[k]=cents(el.querySelector(`[name="${k}"]`).value);l.notes=el.querySelector('[name="lineNotes"]').value.trim();}}
+function autofill(){
+ // Απλοποίηση: συμπλήρωση αυτόματα όσων προκύπτουν από τα υπόλοιπα (αίτημα, ημερομηνίες, παραληφθέν).
+ for(const l of draft.lines){
+  if(l.stage==='Προς αίτηση')continue;
+  if(!l.requested)l.requested=l.received>0?l.received:l.proposed;
+  if(l.requested<l.received)l.requested=l.received;
+  if(l.stage==='Παραλήφθηκε'&&!l.received)l.received=l.requested;
+  if(!l.requestDate)l.requestDate=today()<draft.date?draft.date:today();
+  if(l.received>0&&!l.receiveDate)l.receiveDate=today()<l.requestDate?l.requestDate:today();
+  const el=$(`[data-line="${l.id}"]`);if(!el)continue;
+  for(const k of ['requested','received'])el.querySelector(`[name="${k}"]`).value=decimal(l[k]);
+  for(const k of ['requestDate','receiveDate'])el.querySelector(`[name="${k}"]`).value=l[k];
+ }
+}
 function calculate(){try{readDraft();const total=sum(draft.lines,l=>l.cost),target=draft.total-draft.recognized;if(target<0)throw Error('Το αναγνωρισμένο ποσό υπερβαίνει το κόστος.');if(draft.type==='Plafond'&&total<=draft.total){const amounts=total===draft.total?allocate(draft.lines.map(l=>l.cost),target):draft.lines.map(l=>Math.min(l.cost,partialShare(l.cost,target,draft.total)));draft.lines.forEach((l,i)=>{l.proposed=amounts[i];const el=$(`[data-line="${l.id}"]`);el.querySelector('[name="proposed"]').value=decimal(l.proposed);el.querySelector('[data-proposal-label]').textContent=money(l.proposed);});}$('#calculation').innerHTML=`<div><small>ΠΡΟΣ ΚΑΛΥΨΗ</small><strong>${money(target)}</strong></div><div><small>${draft.type==='Plafond'?'ΚΟΙΝΗ ΕΚΠΤΩΣΗ':'ΠΟΣΟΣΤΟ ΠΕΡΙΚΟΠΗΣ'}</small><strong>${draft.total?(100*target/draft.total).toLocaleString('el-GR',{maximumFractionDigits:4}):'0'}%</strong></div><div><small>ΕΛΕΓΧΟΣ ΚΟΣΤΟΥΣ</small><b class="${total===draft.total?'ok':'danger'}">${money(total)} / ${money(draft.total)}</b><small>Προτάσεις: ${money(sum(draft.lines,l=>l.proposed))}</small></div><button type="button" id="use-proposals" class="secondary">Πρόταση → ποσό αιτήματος</button>`;$('#use-proposals').onclick=()=>{draft.lines.forEach(l=>{if(l.stage==='Προς αίτηση')$(`[data-line="${l.id}"] [name="requested"]`).value=decimal(l.proposed);});dirty=true;calculate();};$('#draft-status').innerHTML=badge(status(draft));}catch(e){$('#calculation').textContent=e.message;}}
 function formError(e){$('#form-errors').textContent=e.message;$('#form-errors').scrollIntoView({block:'nearest'});}
 async function saveDraft(e){
  e.preventDefault();if(saving)return;
  const button=e.submitter;
  try{
-  readDraft();const errors=validate(draft);
+  readDraft();autofill();const errors=validate(draft);
   if(data.cases.some(c=>c.id!==draft.id&&normalize(c.code)===normalize(draft.code)))errors.push('Υπάρχει ήδη περιστατικό με αυτόν τον κωδικό.');
   if(errors.length)throw Error(errors.join('\n'));
   saving=true;button.disabled=true;button.textContent='Αποθήκευση…';
