@@ -3,7 +3,27 @@ export const STATUSES=['Νέο','Προς αίτηση','Αναμονή πιστ
 export const STAGES=['Προς αίτηση','Ζητήθηκε','Παραλήφθηκε','Απορρίφθηκε'];
 export const money=n=>new Intl.NumberFormat('el-GR',{style:'currency',currency:'EUR'}).format(n/100);
 export const sum=(xs,fn)=>xs.reduce((a,x)=>a+fn(x),0);
-export function cents(value){const s=String(value??'').trim().replace(',','.');if(!/^\d+(\.\d{1,2})?$/.test(s))throw Error('Ποσά: θετικός αριθμός με έως 2 δεκαδικά, χωρίς διαχωριστικό χιλιάδων.');const [a,b='']=s.split('.');const n=Number(a)*100+Number(b.padEnd(2,'0'));if(!Number.isSafeInteger(n)||n>10000000000)throw Error('Το ποσό υπερβαίνει το όριο.');return n;}
+export function cents(value){
+ const raw=String(value??'').trim().replace(/[\s€]/g,'');
+ if(!/^\d[\d.,]*$/.test(raw))throw Error('Γράψτε ένα έγκυρο θετικό ποσό.');
+ const dots=(raw.match(/\./g)||[]).length,commas=(raw.match(/,/g)||[]).length;
+ let integer=raw,fraction='';
+ if(dots&&commas){
+  const decimal=raw.lastIndexOf('.')>raw.lastIndexOf(',')?'.':',';
+  const cut=raw.lastIndexOf(decimal);integer=raw.slice(0,cut);fraction=raw.slice(cut+1);
+  const thousands=decimal==='.'?',':'.';
+  if(!/^\d{1,3}([.,]\d{3})*$/.test(integer)||integer.includes(decimal)||!/^\d{1,2}$/.test(fraction))throw Error('Γράψτε ένα έγκυρο ποσό, π.χ. 1.399,78.');
+  integer=integer.split(thousands).join('');
+ }else if(dots||commas){
+  const separator=dots?'.':',',parts=raw.split(separator);
+  if(parts.length===2&&parts[1].length<=2){[integer,fraction]=parts;}
+  else if(parts.slice(1).every(part=>part.length===3)&&/^\d{1,3}$/.test(parts[0]))integer=parts.join('');
+  else if(parts.length>2&&parts.at(-1).length<=2&&parts.slice(1,-1).every(part=>part.length===3)&&/^\d{1,3}$/.test(parts[0])){fraction=parts.pop();integer=parts.join('');}
+  else throw Error('Γράψτε ένα έγκυρο ποσό, π.χ. 1.399,78.');
+ }
+ if(!/^\d+$/.test(integer)||fraction&&!/^\d{1,2}$/.test(fraction))throw Error('Γράψτε ένα έγκυρο θετικό ποσό.');
+ const n=Number(integer)*100+Number(fraction.padEnd(2,'0'));if(!Number.isSafeInteger(n)||n>10000000000)throw Error('Το ποσό υπερβαίνει το όριο.');return n;
+}
 export const decimal=n=>(n/100).toFixed(2);
 export const today=()=>new Date().toLocaleDateString('sv-SE');
 export function allocate(costs,target){
