@@ -10,7 +10,7 @@
 
 /* Company sections inside a case */
 .line-card{background:#f1f6f9;border-color:#c7d8e4;border-left:4px solid #6f96af;box-shadow:0 2px 8px #294d6712}.line-card .line-title{margin:-18px -22px 16px;padding:14px 18px;background:#e5eef4;border-bottom:1px solid #cbdbe5;border-radius:7px 7px 0 0}.line-card .line-title h3{color:#294f69;font-weight:700}.line-card input,.line-card select,.line-card textarea,.line-card .file-picker{background:#fff}@media(max-width:520px){.line-card .line-title{margin:-16px -16px 14px}}
-.credit-row{cursor:pointer}.credit-row:hover{background:#f2f7fa}.credit-row:focus-visible{outline:3px solid #89b8d2;outline-offset:-3px}.credit-link{color:#285f87;font-size:12px;font-weight:650}.credit-link span{font-size:10px;margin-left:3px}.line-card.focused-credit{border-color:#3f7698;box-shadow:0 0 0 3px #6f96af33,0 8px 22px #294d6720}
+.credit-row,.case-row{cursor:pointer}.credit-row:hover,.case-row:hover{background:#f2f7fa}.credit-row:focus-visible,.case-row:focus-visible{outline:3px solid #89b8d2;outline-offset:-3px}.credit-link{color:#285f87;font-size:12px;font-weight:650}.credit-link span{font-size:10px;margin-left:3px}.line-card.focused-credit{border-color:#3f7698;box-shadow:0 0 0 3px #6f96af33,0 8px 22px #294d6720}
 
 /* Compact credit table and balanced page action */
 .credit-table{table-layout:fixed}.credit-table th,.credit-table td{padding-left:8px;padding-right:8px}.credit-table th:first-child{width:25%}.credit-table th:nth-child(2){width:12%}.credit-table th:nth-child(n+3):nth-child(-n+6){width:11%}.credit-table th:nth-child(7){width:10%}.credit-table th:nth-child(8){width:9%}.page-heading>.primary{margin-right:clamp(28px,5vw,96px)}@media(max-width:850px){.credit-table{min-width:920px}.page-heading>.primary{margin-right:0}}
