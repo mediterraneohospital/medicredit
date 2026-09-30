@@ -1,4 +1,4 @@
-import {TYPES,STATUSES,STAGES,money,sum,cents,decimal,today,allocate,status,outstanding,rejected,waitingDays,validate,totalsWarnings,partialShare} from './domain.js?v=1.9';
+import {TYPES,STATUSES,STAGES,money,sum,cents,decimal,today,allocate,status,outstanding,rejected,waitingDays,validate,partialShare} from './domain.js?v=1.9';
 import * as store from './data.js?v=1.17';
 import {buildWorkbook} from './xlsx.js?v=1.13';
 const $=s=>document.querySelector(s), esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -81,7 +81,7 @@ async function saveDraft(e){
    const file=el.querySelector('[name="creditUpload"]').files[0];
    if(file)draft.lines.find(l=>l.id===el.dataset.line).credit=await store.upload(file,draft.id);
   }
-  const warn=totalsWarnings(draft);await store.saveCase(draft);dirty=false;$('#editor').close();await reload();toast(warn.length?'Αποθηκεύτηκε (ημιτελές): '+warn.join(' '):'Το περιστατικό αποθηκεύτηκε.');
+await store.saveCase(draft);dirty=false;$('#editor').close();await reload();toast('Το περιστατικό αποθηκεύτηκε.');
  }catch(e){formError(e);}
  finally{saving=false;if($('#case-form'))$('#case-form').inert=false;button.disabled=false;button.textContent=draft?.version?'Αποθήκευση αλλαγών':'Αποθήκευση περιστατικού';}
 }
