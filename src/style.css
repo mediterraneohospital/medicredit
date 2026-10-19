@@ -17,10 +17,14 @@
 .credit-table{table-layout:fixed}.credit-table th,.credit-table td{padding-left:8px;padding-right:8px}.credit-table th:first-child{width:25%}.credit-table th:nth-child(2){width:12%}.credit-table th:nth-child(n+3):nth-child(-n+6){width:11%}.credit-table th:nth-child(7){width:10%}.credit-table th:nth-child(8){width:9%}.page-heading>.primary{margin-right:clamp(28px,5vw,96px)}@media(max-width:850px){.credit-table{min-width:920px}.page-heading>.primary{margin-right:0}}
 .rejected-amount{color:#b85c58;font-weight:650}
 
+/* Account registration and approval */
+.login form .primary,.login form .secondary{width:100%}.auth-message{margin:18px 0 0;padding:12px 14px;border-radius:7px;background:#e8f4ef;color:#327965;font-size:12px;line-height:1.5}.pending-view{text-align:center}.pending-view .brand{text-align:left}.pending-symbol{width:48px;height:48px;margin:30px auto 12px;display:grid;place-items:center;border-radius:50%;background:#e7f4ef;color:#26806d;font-size:24px;font-weight:700}.pending-view h1{margin-top:12px}.pending-email{margin:20px 0;padding:11px;border-radius:7px;background:#f2f6f8;color:#49657b;font-size:12px}.pending-actions{display:grid;gap:10px}.pending-count{background:#fff0d5;color:#9a671e}.signed-user{color:#526c80}.current-user{font-size:11px;color:#8292a0}
+
 /* Stable positioning across sections */
 .page-heading{min-height:76px}.filters{min-height:58px}.panel-title{min-height:79px}.report-tabs{margin:0;align-items:center}.company-filters .search{max-width:430px}
 
 /* Keep primary actions close to the left-hand content */
 .page-heading{justify-content:flex-start}.page-heading>.primary{margin-left:44px;margin-right:0}.reports-title{justify-content:flex-start}.reports-title .report-tabs{margin-left:34px}@media(max-width:850px){.page-heading>.primary,.reports-title .report-tabs{margin-left:0}.reports-title{flex-wrap:wrap}}
+
 
 
