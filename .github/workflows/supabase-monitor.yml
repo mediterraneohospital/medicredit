@@ -1,0 +1,32 @@
+name: Supabase monitor
+on:
+  schedule:
+    - cron: '17 */4 * * *'
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['monitoring/**', '.github/workflows/supabase-monitor.yml']
+permissions:
+  contents: read
+  issues: write
+concurrency:
+  group: supabase-monitor
+  cancel-in-progress: false
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24'
+      - name: Offline tests
+        run: node --test monitoring/*.test.mjs
+      - name: Database probes
+        run: node monitoring/probe.mjs
+      - name: Failure or recovery notification
+        if: always()
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: node monitoring/notify.mjs
