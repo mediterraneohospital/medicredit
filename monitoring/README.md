@@ -24,11 +24,10 @@ changes. Do not rely exclusively on a workflow to detect its own absence.
 
 Validation: `node --test monitoring/*.test.mjs`, then `node monitoring/probe.mjs`.
 Live 2026-11-17: shared apps and MediCredit return HTTP 200 with []. MUA Planner
-returns HTTP 401/42501 (anon lacks SELECT). It is deliberately reported as a failure,
-not as protected. Do not grant anonymous SELECT on clients to fix this. A project
-administrator must expose a dedicated constant read-only health RPC with no access
-to business tables, then change that project's probe to the RPC and verify it live.
-Connected SQL/key tools currently reject access, so this final step is blocked.
+uses GET /rpc/monitor_health_v1 and requires exactly {"ok":true}. The SQL STABLE
+SECURITY INVOKER function returns a constant and has an empty search_path. Only
+anon/authenticated receive EXECUTE; no SELECT rights on business tables were added.
+Its earlier HTTP 401 was fixed by replacing the table probe with this dedicated RPC.
 
 Sources: https://supabase.com/docs/guides/platform/free-project-pausing
 and https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule

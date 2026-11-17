@@ -1,5 +1,5 @@
 [
   {"name":"Shared apps","ref":"odtbtugzilxsfqxlpofq","key":"sb_publishable_ch-7C1ihpZRrxEhXFqV1xA_hXPwq61S","table":"tododata"},
   {"name":"MediCredit","ref":"mquukxuoqmcfxpaaxurc","key":"sb_publishable_MtxrSAOofZi7PZrRDRM8HQ_ju45Ux4E","table":"mc_companies"},
-  {"name":"MUA Planner","ref":"htlifrjwigbeqijsqzxn","key":"sb_publishable_gHcyF5k8vii7E8iZdO1fHg_a32hkByH","table":"clients"}
+  {"name":"MUA Planner","ref":"htlifrjwigbeqijsqzxn","key":"sb_publishable_gHcyF5k8vii7E8iZdO1fHg_a32hkByH","rpc":"monitor_health_v1"}
 ]

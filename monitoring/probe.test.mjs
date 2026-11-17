@@ -2,6 +2,14 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {probe, validate} from './probe.mjs';
 const p={ref:'a'.repeat(20),key:'sb_publishable_test',table:'sample'};
+test('constant health RPC uses GET and requires exact OK response',async()=>{
+  const rpc={...p,table:undefined,rpc:'monitor_health_v1'}; validate([rpc]);
+  assert.throws(()=>validate([{...p,rpc:'monitor_health_v1'}]));
+  for(const [body,ok] of [[{ok:true},true],[{ok:false},false],[[],false],[{ok:true,extra:1},false]]) {
+    const r=await probe(rpc,{request:async(url,opts)=>{assert.ok(url.endsWith('/rpc/monitor_health_v1'));assert.equal(opts.method,'GET');return Response.json(body)}});
+    assert.equal(r.ok,ok);
+  }
+});
 test('inventory rejects duplicates, secrets, injected paths and empty input',()=>{
   validate([p]);
   for(const input of [[],[p,p],[{...p,key:'sb_secret_test'}],[{...p,table:'x?limit=1'}]]) assert.throws(()=>validate(input));

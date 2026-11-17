@@ -6,7 +6,7 @@ export function validate(projects) {
   const refs = new Set();
   for (const p of projects) {
     if (!/^[a-z]{20}$/.test(p.ref) || !/^sb_publishable_[\w-]+$/.test(p.key) ||
-        !/^[a-z_][a-z0-9_]*$/.test(p.table) || refs.has(p.ref)) throw new Error('Invalid inventory');
+        Boolean(p.table) === Boolean(p.rpc) || !/^[a-z_][a-z0-9_]*$/.test(p.rpc || p.table) || refs.has(p.ref)) throw new Error('Invalid inventory');
     refs.add(p.ref);
   }
 }
@@ -17,14 +17,16 @@ export async function probe(p, {request = fetch, sleep = ms => new Promise(r => 
   let status = 0;
   for (let attempt = 1; attempt <= 3; attempt++) {
     try {
-      const res = await request(`https://${p.ref}.supabase.co/rest/v1/${p.table}?select=*&limit=0`, {
+      const endpoint = p.rpc ? `rpc/${p.rpc}` : `${p.table}?select=*&limit=0`;
+      const res = await request(`https://${p.ref}.supabase.co/rest/v1/${endpoint}`, {
         method: 'GET', redirect: 'error', headers: {apikey: p.key, 'Cache-Control':'no-cache'},
         signal: AbortSignal.timeout(15000)
       });
       status = res.status;
       if (res.ok) {
         const body = await res.json();
-        if (Array.isArray(body) && body.length === 0) return {ref:p.ref, ok:true, status, attempts:attempt, ms:Date.now()-started};
+        const valid = p.rpc ? body?.ok === true && Object.keys(body).length === 1 : Array.isArray(body) && body.length === 0;
+        if (valid) return {ref:p.ref, ok:true, status, attempts:attempt, ms:Date.now()-started};
         failure = 'unexpected-response';
       } else {
         failure = status === 401 || status === 403 ? 'access-denied' : `http-${status}`;
