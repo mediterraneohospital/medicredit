@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {allocate,cents,status,validate,waitingDays,outstanding,rejected,totalsWarnings} from '../src/domain.js';
+import {allocate,cents,status,creditStage,validate,waitingDays,outstanding,rejected,totalsWarnings} from '../src/domain.js';
 const line=()=>({id:'a',companyId:'a',cost:10000,proposed:4000,requested:4000,received:0,stage:'Προς αίτηση',requestDate:'',receiveDate:'',creditNumber:'',notes:''});
 const sample=()=>({code:'A1',patient:'Demo',doctor:'Demo',incidentDate:'2026-08-28',date:'2026-09-01',type:'Plafond',total:10000,recognized:6000,notes:'',closedReason:'',lines:[line()]});
 test('10000 / 6000 official example',()=>assert.deepEqual(allocate([400000,350000,250000],400000),[160000,140000,100000]));
@@ -13,3 +13,5 @@ test('non-Plafond partial allocation can be saved while incomplete',()=>{const c
 test('partial receipt requires date, credit number is optional, over-receipt is rejected',()=>{const c=sample(),l=c.lines[0];l.stage='Ζητήθηκε';l.requestDate='2026-09-02';l.received=100;assert.ok(validate(c).length);l.receiveDate='2026-09-03';assert.deepEqual(validate(c),[]);l.received=4001;assert.ok(validate(c).length);});
 test('pending and waiting days',()=>{const l=line();assert.equal(outstanding(l),4000);Object.assign(l,{stage:'Ζητήθηκε',requested:3000,received:500,requestDate:'2026-09-01'});assert.equal(outstanding(l),2500);assert.equal(waitingDays(l,'2026-09-29'),28);});
 test('rejected credits are resolved and counted separately',()=>{const c=sample(),l=c.lines[0];Object.assign(l,{stage:'Απορρίφθηκε',requested:4000,requestDate:'2026-09-02'});assert.equal(outstanding(l),0);assert.equal(rejected(l),4000);assert.equal(status(c),'Κλειστό με διαφορά');assert.deepEqual(validate(c),[]);});
+
+test('partial receipt can stay pending or close with rejected remainder',()=>{const c=sample(),l=c.lines[0];Object.assign(l,{stage:'Παραλήφθηκε',requested:4000,received:1000,requestDate:'2026-09-02',receiveDate:'2026-09-03',remainingOutcome:'pending'});assert.equal(creditStage(l),'Μερικώς παραλήφθηκε');assert.equal(outstanding(l),3000);assert.equal(rejected(l),0);assert.equal(status(c),'Μερικώς ολοκληρωμένο');l.remainingOutcome='rejected';assert.equal(outstanding(l),0);assert.equal(rejected(l),3000);assert.equal(status(c),'Κλειστό με διαφορά');assert.deepEqual(validate(c),[]);});
